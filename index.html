@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISMS Certification Practice Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #1e3c72;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+
+        .question-counter {
+            text-align: right;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .question-container {
+            margin-bottom: 30px;
+        }
+
+        .question {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .option:hover {
+            border-color: #2a5298;
+            background: #f0f4f8;
+            transform: translateX(5px);
+        }
+
+        .option.selected {
+            border-color: #2a5298;
+            background: #e3f2fd;
+        }
+
+        .option.correct {
+            border-color: #4CAF50;
+            background: #e8f5e9;
+        }
+
+        .option.incorrect {
+            border-color: #f44336;
+            background: #ffebee;
+        }
+
+        .option input[type="radio"] {
+            display: none;
+        }
+
+        .option-label {
+            font-weight: 600;
+            color: #2a5298;
+            min-width: 30px;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feedback.correct {
+            display: block;
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-left: 4px solid #4CAF50;
+        }
+
+        .feedback.incorrect {
+            display: block;
+            background: #ffebee;
+            color: #c62828;
+            border-left: 4px solid #f44336;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: block;
+            margin: 30px auto 0;
+            font-weight: 600;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results-container {
+            display: none;
+            text-align: center;
+        }
+
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: conic-gradient(#4CAF50 calc(var(--score) * 1%), #e0e0e0 0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 30px auto;
+            position: relative;
+        }
+
+        .score-circle::before {
+            content: '';
+            position: absolute;
+            width: 160px;
+            height: 160px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .score-text {
+            position: relative;
+            z-index: 1;
+            font-size: 3em;
+            font-weight: bold;
+            color: #1e3c72;
+        }
+
+        .score-message {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .review-section {
+            margin-top: 40px;
+            text-align: left;
+        }
+
+        .review-item {
+            background: #f5f5f5;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #2a5298;
+        }
+
+        .review-item.correct {
+            border-left-color: #4CAF50;
+            background: #e8f5e9;
+        }
+
+        .review-item.incorrect {
+            border-left-color: #f44336;
+            background: #ffebee;
+        }
+
+        .review-question {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .review-answer {
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .review-correct {
+            color: #2e7d32;
+            font-weight: 600;
+        }
+
+        .start-screen {
+            text-align: center;
+        }
+
+        .start-screen h2 {
+            color: #1e3c72;
+            margin-bottom: 20px;
+        }
+
+        .features {
+            text-align: left;
+            margin: 30px 0;
+            padding: 20px;
+            background: #f0f4f8;
+            border-radius: 10px;
+        }
+
+        .features li {
+            margin-bottom: 10px;
+            color: #555;
+            list-style: none;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Start Screen -->
+        <div id="startScreen" class="start-screen">
+            <h1>🛡️ ISMS Certification Practice Test</h1>
+            <h2>Information Security Management Systems</h2>
+            <div class="features">
+                <ul>
+                    <li>30 multiple choice questions based on ISO 27001 standards</li>
+                    <li>Immediate feedback after each answer</li>
+                    <li>Detailed score report with correct answers</li>
+                    <li>Covers risk assessment, controls, and compliance</li>
+                    <li>Practice for your ISMS certification exam</li>
+                </ul>
+            </div>
+            <button class="btn" onclick="startTest()">Start Practice Test</button>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quizScreen" class="hidden">
+            <div class="header">
+                <h1>ISMS Practice Test</h1>
+                <p>Select the best answer for each question</p>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+            </div>
+            
+            <div class="question-counter" id="questionCounter">Question 1 of 30</div>
+            
+            <div class="question-container" id="questionContainer">
+                <!-- Question content will be inserted here -->
+            </div>
+
+            <div id="feedback" class="feedback"></div>
+
+            <button class="btn" id="nextBtn" onclick="nextQuestion()" disabled>Next Question</button>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="resultsScreen" class="results-container">
+            <h1>Test Complete! 🎉</h1>
+            <div class="score-message" id="scoreMessage"></div>
+            <div class="score-circle" id="scoreCircle">
+                <div class="score-text" id="scoreText"></div>
+            </div>
+            <p id="scoreDetails"></p>
+            <button class="btn" onclick="showReview()">Review Answers</button>
+            <button class="btn" onclick="restartTest()" style="margin-top: 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">Retake Test</button>
+            
+            <div id="reviewSection" class="review-section" style="display: none;">
+                <h2>Answer Review</h2>
+                <div id="reviewContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ISMS Question Bank (30 Questions)
+        const questions = [
+            {
+                question: "What does ISMS stand for?",
+                options: [
+                    "Information Security Management System",
+                    "Internet Security Management Service",
+                    "Internal Security Management Standard",
+                    "Information Systems Management Security"
+                ],
+                correct: 0,
+                explanation: "ISMS stands for Information Security Management System, which is a systematic approach to managing sensitive company information."
+            },
+            {
+                question: "Which ISO standard specifies the requirements for establishing, implementing, maintaining, and continually improving an ISMS?",
+                options: [
+                    "ISO 9001",
+                    "ISO 14001",
+                    "ISO 27001",
+                    "ISO 20000"
+                ],
+                correct: 2,
+                explanation: "ISO/IEC 27001 is the international standard for Information Security Management Systems."
+            },
+            {
+                question: "What is the primary objective of risk assessment in ISMS?",
+                options: [
+                    "To eliminate all risks completely",
+                    "To identify, analyze, and evaluate information security risks",
+                    "To purchase insurance for all assets",
+                    "To fire employees who cause risks"
+                ],
+                correct: 1,
+                explanation: "Risk assessment involves identifying, analyzing, and evaluating information security risks to determine appropriate treatment."
+            },
+            {
+                question: "Which of the following is NOT one of the three pillars of information security (CIA Triad)?",
+                options: [
+                    "Confidentiality",
+                    "Integrity",
+                    "Availability",
+                    "Authenticity"
+                ],
+                correct: 3,
+                explanation: "The CIA Triad consists of Confidentiality, Integrity, and Availability. Authenticity, while important, is not part of the core triad."
+            },
+            {
+                question: "What is the term for the potential that a threat will exploit a vulnerability?",
+                options: [
+                    "Risk",
+                    "Control",
+                    "Asset",
+                    "Impact"
+                ],
+                correct: 0,
+                explanation: "Risk is defined as the potential that a given threat will exploit vulnerabilities of an asset or group of assets."
+            },
+            {
+                question: "In ISO 27001, what does 'Statement of Applicability' (SoA) document?",
+                options: [
+                    "Employee salaries",
+                    "Which controls are applicable and why",
+                    "Company history",
+                    "Software licenses"
+                ],
+                correct: 1,
+                explanation: "The Statement of Applicability documents which controls from Annex A are applicable to the organization's ISMS and justifies exclusions."
+            },
+            {
+                question: "What is the first step in the risk management process?",
+                options: [
+                    "Risk treatment",
+                    "Risk assessment",
+                    "Risk monitoring",
+                    "Risk communication"
+                ],
+                correct: 1,
+                explanation: "Risk assessment (establishing the context, risk identification, risk analysis, and risk evaluation) comes before risk treatment."
+            },
+            {
+                question: "Which control from Annex A deals with ensuring employees and contractors are suitable for their roles?",
+                options: [
+                    "A.7.1 - Screening",
+                    "A.12.3 - Backup",
+                    "A.16.1 - Management of information security incidents",
+                    "A.18.1 - Compliance with legal and contractual requirements"
+                ],
+                correct: 0,
+                explanation: "Control A.7.1 (Screening) ensures that candidates for employment, contractors, and third-party users are screened."
+            },
+            {
+                question: "What does 'residual risk' refer to?",
+                options: [
+                    "Risk before treatment",
+                    "Risk remaining after risk treatment",
+                    "Risk that cannot be measured",
+                    "Risk transferred to insurance"
+                ],
+                correct: 1,
+                explanation: "Residual risk is the risk remaining after risk treatment and implementation of controls."
+            },
+            {
+                question: "Which of the following is a technical control?",
+                options: [
+                    "Security awareness training",
+                    "Firewalls and antivirus software",
+                    "Background checks",
+                    "Security policies"
+                ],
+                correct: 1,
+                explanation: "Firewalls and antivirus software are technical controls, while the others are administrative or physical controls."
+            },
+            {
+                question: "What is the purpose of internal audits in ISMS?",
+                options: [
+                    "To punish employees",
+                    "To determine whether the ISMS conforms to planned arrangements",
+                    "To fire the CISO",
+                    "To increase the budget"
+                ],
+                correct: 1,
+                explanation: "Internal audits are conducted to provide information on whether the ISMS conforms to the organization's own requirements and ISO 27001."
+            },
+            {
+                question: "Which document provides high-level direction and support for information security?",
+                options: [
+                    "Risk assessment report",
+                    "Information security policy",
+                    "Incident log",
+                    "Access control list"
+                ],
+                correct: 1,
+                explanation: "The information security policy is a high-level document that provides management direction and support for information security."
+            },
+            {
+                question: "What is 'risk treatment' in the context of ISMS?",
+                options: [
+                    "Ignoring risks",
+                    "The process to modify risk",
+                    "Only accepting risks",
+                    "Transferring all risks to third parties"
+                ],
+                correct: 1,
+                explanation: "Risk treatment is the process to modify risk, which can include avoiding, taking, removing the risk source, changing likelihood/consequences, sharing, or retaining risk."
+            },
+            {
+                question: "Which Annex A control category covers cryptography?",
+                options: [
+                    "A.9 - Access control",
+                    "A.10 - Cryptography",
+                    "A.12 - Operations security",
+                    "A.13 - Communications security"
+                ],
+                correct: 1,
+                explanation: "Annex A.10 specifically covers Cryptography, including policies and key management."
+            },
+            {
+                question: "What is a 'vulnerability' in information security?",
+                options: [
+                    "A weakness that can be exploited",
+                    "A type of malware",
+                    "A security control",
+                    "An insurance policy"
+                ],
+                correct: 0,
+                explanation: "A vulnerability is a weakness of an asset or group of assets that can be exploited by one or more threats."
+            },
+            {
+                question: "Who is typically responsible for the overall implementation and maintenance of ISMS?",
+                options: [
+                    "IT Technician",
+                    "Chief Information Security Officer (CISO) or designated security manager",
+                    "HR Manager",
+                    "Marketing Director"
+                ],
+                correct: 1,
+                explanation: "The CISO or designated security manager is typically responsible for implementing and maintaining the ISMS, though top management has ultimate accountability."
+            },
+            {
+                question: "What does 'business continuity' refer to?",
+                options: [
+                    "Making continuous profits",
+                    "The capability to continue delivery of products/services at acceptable predefined levels following disruptive incidents",
+                    "Hiring new staff continuously",
+                    "Continuous software updates"
+                ],
+                correct: 1,
+                explanation: "Business continuity is about maintaining business functions or quickly resuming them in the event of a major disruption."
+            },
+            {
+                question: "Which of the following is NOT a risk treatment option?",
+                options: [
+                    "Risk avoidance",
+                    "Risk taking/acceptance",
+                    "Risk elimination (100%)",
+                    "Risk transfer"
+                ],
+                correct: 2,
+                explanation: "It is impossible to eliminate 100% of risk. Options include avoidance, taking/acceptance, modification, transfer, and retention."
+            },
+            {
+                question: "What is the purpose of 'management review' in ISMS?",
+                options: [
+                    "To review employee performance only",
+                    "To ensure the continuing suitability, adequacy, and effectiveness of the ISMS",
+                    "To review software code",
+                    "To review office furniture"
+                ],
+                correct: 1,
+                explanation: "Management review is conducted to ensure the continuing suitability, adequacy, and effectiveness of the ISMS."
+            },
+            {
+                question: "Which control ensures that information security is considered in project management?",
+                options: [
+                    "A.6.1.5 - Information security in project management",
+                    "A.12.1 - Operational procedures and responsibilities",
+                    "A.14.1 - Security requirements of information systems",
+                    "A.17.1 - Information security continuity"
+                ],
+                correct: 0,
+                explanation: "Control A.6.1.5 specifically addresses information security in project management, regardless of the type of project."
+            },
+            {
+                question: "What is 'acceptable use' policy primarily concerned with?",
+                options: [
+                    "Acceptable salary ranges",
+                    "Rules for proper use of assets",
+                    "Acceptable working hours",
+                    "Acceptable dress code"
+                ],
+                correct: 1,
+                explanation: "Acceptable use policies define the rules for proper use of information processing facilities and assets."
+            },
+            {
+                question: "Which of the following is an example of a physical control?",
+                options: [
+                    "Password policy",
+                    "Perimeter fencing and security guards",
+                    "Encryption algorithm",
+                    "Background screening"
+                ],
+                correct: 1,
+                explanation: "Perimeter fencing and security guards are physical controls. Password policies are administrative, encryption is technical, and screening is administrative."
+            },
+            {
+                question: "What does 'RTO' stand for in business continuity planning?",
+                options: [
+                    "Risk Treatment Objective",
+                    "Recovery Time Objective",
+                    "Return To Office",
+                    "Real-Time Operations"
+                ],
+                correct: 1,
+                explanation: "Recovery Time Objective (RTO) is the maximum acceptable time for restoring a business function after a disruption."
+            },
+            {
+                question: "Which Annex A control deals with protection against malware?",
+                options: [
+                    "A.12.2 - Protection from malware",
+                    "A.9.4 - System and application access control",
+                    "A.13.1 - Network security management",
+                    "A.16.1 - Management of information security incidents"
+                ],
+                correct: 0,
+                explanation: "Control A.12.2 specifically addresses protection from malware, including detection, prevention, and recovery controls."
+            },
+            {
+                question: "What is the purpose of 'segregation of duties'?",
+                options: [
+                    "To ensure employees don't talk to each other",
+                    "To reduce the risk of fraud and error by dividing responsibilities",
+                    "To create more jobs",
+                    "To separate departments physically"
+                ],
+                correct: 1,
+                explanation: "Segregation of duties (SoD) is a control that reduces the risk of fraud and error by ensuring no single individual has complete control over a process."
+            },
+            {
+                question: "What is 'continual improvement' in the context of ISMS?",
+                options: [
+                    "Making changes constantly without reason",
+                    "Recurring activity to enhance performance",
+                    "Hiring new staff regularly",
+                    "Buying new software monthly"
+                ],
+                correct: 1,
+                explanation: "Continual improvement is a recurring activity to enhance performance, based on the Plan-Do-Check-Act (PDCA) cycle."
+            },
+            {
+                question: "Which document describes the acceptable level of risk for an organization?",
+                options: [
+                    "Risk assessment report",
+                    "Risk acceptance criteria",
+                    "Incident response plan",
+                    "Asset inventory"
+                ],
+                correct: 1,
+                explanation: "Risk acceptance criteria define the acceptable level of risk that the organization is willing to tolerate."
+            },
+            {
+                question: "What is the primary purpose of access control?",
+                options: [
+                    "To prevent anyone from accessing systems",
+                    "To ensure authorized users have access while preventing unauthorized access",
+                    "To monitor employee productivity",
+                    "To increase system complexity"
+                ],
+                correct: 1,
+                explanation: "Access control ensures that authorized users have access to assets while preventing unauthorized access."
+            },
+            {
+                question: "Which of the following is NOT typically part of incident management?",
+                options: [
+                    "Incident detection and reporting",
+                    "Incident assessment and decision",
+                    "Incident response",
+                    "Incident concealment"
+                ],
+                correct: 3,
+                explanation: "Incident concealment is not part of proper incident management, which includes detection, reporting, assessment, response, and learning."
+            },
+            {
+                question: "What does 'scope of the ISMS' define?",
+                options: [
+                    "The salary range of security staff",
+                    "The boundaries and applicability of the ISMS",
+                    "The office locations only",
+                    "The software versions used"
+                ],
+                correct: 1,
+                explanation: "The scope of the ISMS defines its boundaries and applicability, including what is covered and what is excluded, and the justification for exclusions."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let userAnswers = [];
+        let score = 0;
+        let selectedOption = null;
+
+        function startTest() {
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('quizScreen').classList.remove('hidden');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const question = questions[currentQuestion];
+            const container = document.getElementById('questionContainer');
+            
+            let optionsHTML = '';
+            question.options.forEach((option, index) => {
+                optionsHTML += `
+                    <label class="option" onclick="selectOption(${index})">
+                        <input type="radio" name="answer" value="${index}">
+                        <span class="option-label">${String.fromCharCode(65 + index)}.</span>
+                        <span>${option}</span>
+                    </label>
+                `;
+            });
+
+            container.innerHTML = `
+                <div class="question">${currentQuestion + 1}. ${question.question}</div>
+                <div class="options">${optionsHTML}</div>
+            `;
+
+            document.getElementById('questionCounter').textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+            document.getElementById('progressBar').style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+            document.getElementById('feedback').className = 'feedback';
+            document.getElementById('feedback').style.display = 'none';
+            document.getElementById('nextBtn').disabled = true;
+            selectedOption = null;
+        }
+
+        function selectOption(index) {
+            if (selectedOption !== null) return; // Prevent changing answer after selection
+            
+            selectedOption = index;
+            const options = document.querySelectorAll('.option');
+            const question = questions[currentQuestion];
+            
+            options[index].classList.add('selected');
+            
+            // Show correct/incorrect styling
+            if (index === question.correct) {
+                options[index].classList.add('correct');
+                score++;
+                showFeedback(true, question.explanation);
+            } else {
+                options[index].classList.add('incorrect');
+                options[question.correct].classList.add('correct');
+                showFeedback(false, question.explanation);
+            }
+            
+            userAnswers.push({
+                question: question.question,
+                userAnswer: question.options[index],
+                correctAnswer: question.options[question.correct],
+                isCorrect: index === question.correct,
+                explanation: question.explanation
+            });
+            
+            document.getElementById('nextBtn').disabled = false;
+        }
+
+        function showFeedback(isCorrect, explanation) {
+            const feedback = document.getElementById('feedback');
+            feedback.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+            feedback.innerHTML = `
+                <strong>${isCorrect ? '✓ Correct!' : '✗ Incorrect'}</strong><br>
+                ${explanation}
+            `;
+            feedback.style.display = 'block';
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quizScreen').classList.add('hidden');
+            document.getElementById('resultsScreen').classList.remove('hidden');
+            document.getElementById('resultsScreen').style.display = 'block';
+            
+            const percentage = Math.round((score / questions.length) * 100);
+            const scoreCircle = document.getElementById('scoreCircle');
+            const scoreText = document.getElementById('scoreText');
+            
+            scoreCircle.style.setProperty('--score', percentage);
+            scoreText.textContent = `${score}/${questions.length}`;
+            
+            let message = '';
+            if (percentage >= 80) {
+                message = 'Excellent! 🌟 You are well prepared for the ISMS certification!';
+            } else if (percentage >= 60) {
+                message = 'Good job! 👍 You have a solid understanding, but there is room for improvement.';
+            } else {
+                message = 'Keep studying! 📚 Review the materials and try again.';
+            }
+            
+            document.getElementById('scoreMessage').textContent = message;
+            document.getElementById('scoreDetails').textContent = `You scored ${percentage}% (${score} out of ${questions.length} questions correct)`;
+        }
+
+        function showReview() {
+            const reviewSection = document.getElementById('reviewSection');
+            const reviewContent = document.getElementById('reviewContent');
+            
+            if (reviewSection.style.display === 'none') {
+                let html = '';
+                userAnswers.forEach((answer, index) => {
+                    html += `
+                        <div class="review-item ${answer.isCorrect ? 'correct' : 'incorrect'}">
+                            <div class="review-question">${index + 1}. ${answer.question}</div>
+                            <div class="review-answer">Your answer: ${answer.userAnswer} ${answer.isCorrect ? '✓' : '✗'}</div>
+                            ${!answer.isCorrect ? `<div class="review-correct">Correct answer: ${answer.correctAnswer}</div>` : ''}
+                            <div style="margin-top: 10px; font-size: 0.9em; color: #666;">${answer.explanation}</div>
+                        </div>
+                    `;
+                });
+                reviewContent.innerHTML = html;
+                reviewSection.style.display = 'block';
+            } else {
+                reviewSection.style.display = 'none';
+            }
+        }
+
+        function restartTest() {
+            currentQuestion = 0;
+            userAnswers = [];
+            score = 0;
+            selectedOption = null;
+            
+            document.getElementById('resultsScreen').classList.add('hidden');
+            document.getElementById('resultsScreen').style.display = 'none';
+            document.getElementById('reviewSection').style.display = 'none';
+            document.getElementById('quizScreen').classList.remove('hidden');
+            
+            loadQuestion();
+        }
+    </script>
+</body>
+</html>
